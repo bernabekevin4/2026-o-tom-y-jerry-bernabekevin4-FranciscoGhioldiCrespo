@@ -1,9 +1,200 @@
-import example.pepita
+import tomYJerry.*
 
-describe "group of tests for pepita" {
+// describe "group of tests for pepita" {
 
-  test "pepita has initial energy" {
-    assert.equals(100, pepita.energy())
+//   test "pepita has initial energy" {
+//     assert.equals(100, pepita.energy())
+//   }
+
+// }
+
+describe "Casa" {
+
+  test "durante el día el cuidador limpia la casa" {
+      casa.modificarSuciedad(1000 - casa.suciedad())
+      casa.pasaElDia()
+      assert.equals(900, casa.suciedad())
+  }
+
+  test "durante la noche el cuidador duerme" {
+      casa.modificarSuciedad(1000 - casa.suciedad())
+      casa.pasarLaNoche()
+      assert.equals(1050, tom.energia())
+  }
+
+  test "durante la noche Jerry hace quilombo" {
+      casa.modificarSuciedad(1000 - casa.suciedad())
+      casa.pasarLaNoche()
+      assert.equals(1110, casa.suciedad())
+      assert.equals(3, jerry.peso())
+  }
+
+  test "durante el día Tom saca a Jerry si puede atraparlo" {
+      casa.modificarSuciedad(1000 - casa.suciedad())
+      casa.pasaElDia()
+      assert.equals(null, casa.quilombero())
+  }
+}
+
+describe "Tom" {
+
+  test "al limpiar reduce la suciedad en 100" {
+      casa.modificarSuciedad(1000 - casa.suciedad())
+      tom.limpiar(casa)
+      assert.equals(900, casa.suciedad())
+  }
+
+  test "al limpiar pierde 40 de energía" {
+      tom.limpiar(casa)
+      assert.equals(0, tom.energia())
+  }
+
+  test "la velocidad de Tom depende de su energía" {
+      assert.equals(6, tom.velocidad())
+  }
+
+  test "Tom puede atrapar a un quilombero más lento" {
+      assert.that(tom.atrapaQuilombero(jerry))
+  }
+
+  test "Tom no puede atrapar a un quilombero más rápido" {
+      assert.notThat(tom.atrapaQuilombero(butch))
+  }
+
+  test "al dormir Tom recupera 50 de energía" {
+      tom.dormir()
+      assert.equals(60, tom.energia())
+  }
+
+  test "al ser interrumpido Tom pierde 20 de energía" {
+      tom.serInterrumpido()
+      assert.equals(0, tom.energia())
+  }
+
+  test "Tom no puede tener energía negativa al ser interrumpido" {
+      tom.serInterrumpido()
+      assert.equals(0, tom.energia())
+  }
+}
+
+describe "Jerry" {
+
+  test "Jerry aumenta la suciedad en 110 al hacer quilombo" {
+      casa.modificarSuciedad(1000 - casa.suciedad())
+      jerry.hacerQuilombo(casa)
+      assert.equals(1110, casa.suciedad())
+  }
+
+  test "Jerry aumenta su peso en 1 al hacer quilombo" {
+      jerry.hacerQuilombo(casa)
+      assert.equals(6, jerry.peso())
+  }
+
+  test "la velocidad de Jerry depende de su peso" {
+      assert.equals(5, jerry.velocidad())
+  }
+
+  test "Jerry se vuelve más lento al aumentar su peso" {
+      jerry.hacerQuilombo(casa)
+      assert.equals(4, jerry.velocidad())
+  }
+}
+
+describe "Tuffy" {
+
+  test "Tuffy tiene velocidad 10" {
+      assert.equals(10, tuffy.velocidad())
+  }
+
+  test "Tuffy interrumpe al cuidador cuando hace quilombo" {
+      tuffy.hacerQuilombo(casa)
+      assert.equals(0, tom.energia())
+  }
+
+  test "Tuffy no modifica la suciedad de la casa" {
+      casa.modificarSuciedad(1000 - casa.suciedad())
+      tuffy.hacerQuilombo(casa)
+      assert.equals(1000, casa.suciedad())
+  }
+}
+
+describe "Robocat" {
+
+  test "Robocat deja la casa completamente limpia" {
+      casa.modificarSuciedad(500)
+      robocat.limpiar(casa)
+      assert.equals(0, casa.suciedad())
+  }
+
+  test "Robocat puede atrapar a cualquier quilombero" {
+      assert.that(robocat.puedeAtrapar(jerry))
+      assert.that(robocat.puedeAtrapar(tuffy))
+      assert.that(robocat.puedeAtrapar(butch))
+  }
+
+  test "Robocat no pierde energía al limpiar" {
+      casa.modificarSuciedad(500)
+      robocat.limpiar(casa)
+      assert.equals(0, casa.suciedad())
+  }
+
+  test "Robocat no se ve afectado por una interrupción" {
+      robocat.serInterrumpido()
+      assert.that(true)
+  }
+}
+
+describe "Butch" {
+
+  test "Butch tiene velocidad 8" {
+      assert.equals(12, butch.velocidad())
+  }
+
+  test "Butch aumenta la suciedad en 200 al hacer quilombo" {
+      casa.modificarSuciedad(1000 - casa.suciedad())
+      butch.hacerQuilombo(casa)
+      assert.equals(1200, casa.suciedad())
+  }
+}
+
+describe "Pandilla" {
+
+  test "la velocidad de la pandilla es la mitad de la velocidad del miembro más lento" {
+    pandilla.agregarMiembro(jerry)
+    pandilla.agregarMiembro(tuffy)
+    pandilla.agregarMiembro(butch)
+
+      assert.equals(2.5, pandilla.velocidad())
+  }
+
+  test "la pandilla aplica el quilombo de todos sus miembros" {
+      pandilla.agregarMiembro(jerry)
+      pandilla.agregarMiembro(tuffy)
+      pandilla.agregarMiembro(butch)
+
+      casa.modificarSuciedad(1000 - casa.suciedad())
+      pandilla.hacerQuilombo(casa)
+      assert.equals(1310, casa.suciedad())
+  }
+
+  test "una pandilla de más de 3 miembros interrumpe al cuidador" {
+    pandilla.agregarMiembro(jerry)
+    pandilla.agregarMiembro(jerry)
+    pandilla.agregarMiembro(butch)
+    pandilla.agregarMiembro(butch)
+
+    pandilla.hacerQuilombo(casa)
+    assert.equals(0, tom.energia())
+  }
+
+  test "una pandilla de 3 miembros no interrumpe al cuidador" {
+       pandilla.agregarMiembro(jerry)
+    
+    pandilla.agregarMiembro(butch)
+    
+      
+      pandilla.hacerQuilombo(casa)
+      assert.equals(10, tom.energia())
   }
 
 }
